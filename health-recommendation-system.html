@@ -1,412 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Health Recommendation System</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); min-height:100vh; padding:20px; }
+        .container { max-width:900px; margin:0 auto; background:white; border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden; }
+        .header{ background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; padding:30px; text-align:center; position:relative; }
+        .nav-tabs{ display:flex; background:rgba(255,255,255,0.1); margin-top:20px; border-radius:10px; overflow:hidden; justify-content:center; }
+        .nav-tab{ padding:12px 24px; background:white; border:none; color:#667eea; cursor:default; font-weight:600; border-radius:8px; }
+        .content{ padding:40px; }
+        .symptom-section{ margin-bottom:30px; }
+        .symptom-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:15px; margin-bottom:20px; }
+        .symptom-card{ background:#f8f9fa; padding:15px; border-radius:10px; cursor:pointer; transition:all .3s ease; border:2px solid transparent; }
+        .symptom-card.selected{ background:#667eea; color:white; border-color:#764ba2; }
+        .patient-info{ display:flex; gap:12px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+        .severity-selector{ margin:20px 0; }
+        .severity-options{ display:flex; gap:10px; }
+        .severity-btn{ flex:1; padding:12px; border:2px solid #ddd; background:white; border-radius:8px; cursor:pointer; transition:all .3s ease; font-weight:600; }
+        .severity-btn.active{ background:#667eea; color:white; border-color:#667eea; }
+        .analyze-btn{ width:100%; padding:15px; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; border:none; border-radius:10px; font-size:1.1em; font-weight:600; cursor:pointer; margin-top:20px; }
+        .results{ display:none; margin-top:30px; }
+        .results.show{ display:block; animation:fadeIn .5s ease; }
+        @keyframes fadeIn{ from{ opacity:0; transform:translateY(20px); } to{ opacity:1; transform:translateY(0); } }
+        .alert-box{ padding:20px; border-radius:10px; margin-bottom:20px; font-weight:600; }
+        .alert-warning{ background:#fff3cd; border-left:5px solid #ffc107; color:#856404; }
+        .alert-danger{ background:#f8d7da; border-left:5px solid #dc3545; color:#721c24; }
+        .alert-success{ background:#d4edda; border-left:5px solid #28a745; color:#155724; }
+        .recommendation-section{ background:#f8f9fa; padding:25px; border-radius:10px; margin-bottom:20px; }
+        .recommendation-section h3{ color:#667eea; margin-bottom:15px; font-size:1.3em; }
+        .recommendation-list{ list-style:none; }
+        .recommendation-list li{ padding:10px 0; padding-left:25px; position:relative; display:flex; align-items:flex-start; gap:10px; }
+        .recommendation-list li:before{ content:"✓"; position:absolute; left:0; color:#667eea; font-weight:bold; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+        .reset-btn{ padding:12px 30px; background:white; color:#667eea; border:2px solid #667eea; border-radius:8px; cursor:pointer; font-weight:600; transition:all .3s ease; }
+        .reset-btn:hover{ background:#667eea; color:white; }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
+        .small-muted{ font-size:.85em; color:#666; margin-left:6px; font-weight:400; }
+        .infermedica-conds{ margin-bottom:16px; padding:12px; border-radius:8px; background:#eef2ff; color:#1f2937; }
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-        }
-
-        .header h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1em;
-        }
-
-        .nav-tabs {
-            display: flex;
-            background: rgba(255,255,255,0.1);
-            margin-top: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .nav-tab {
-            flex: 1;
-            padding: 12px;
-            background: transparent;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .nav-tab:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        .nav-tab.active {
-            background: white;
-            color: #667eea;
-        }
-
-        .content {
-            padding: 40px;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .symptom-section {
-            margin-bottom: 30px;
-        }
-
-        .symptom-section h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-
-        .symptom-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .symptom-card {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-
-        .symptom-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .symptom-card.selected {
-            background: #667eea;
-            color: white;
-            border-color: #764ba2;
-        }
-
-        .symptom-card h3 {
-            font-size: 1.1em;
-            margin-bottom: 5px;
-        }
-
-        .symptom-card p {
-            font-size: 0.9em;
-            opacity: 0.8;
-        }
-
-        .severity-selector {
-            margin: 20px 0;
-        }
-
-        .severity-selector label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .severity-options {
-            display: flex;
-            gap: 10px;
-        }
-
-        .severity-btn {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #ddd;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-
-        .severity-btn:hover {
-            border-color: #667eea;
-        }
-
-        .severity-btn.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .analyze-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 20px;
-        }
-
-        .analyze-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .analyze-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .results {
-            display: none;
-            margin-top: 30px;
-        }
-
-        .results.show {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .alert-box {
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
-        .alert-warning {
-            background: #fff3cd;
-            border-left: 5px solid #ffc107;
-            color: #856404;
-        }
-
-        .alert-danger {
-            background: #f8d7da;
-            border-left: 5px solid #dc3545;
-            color: #721c24;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            border-left: 5px solid #28a745;
-            color: #155724;
-        }
-
-        .recommendation-section {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-
-        .recommendation-section h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-
-        .recommendation-list {
-            list-style: none;
-        }
-
-        .recommendation-list li {
-            padding: 10px 0;
-            padding-left: 25px;
-            position: relative;
-        }
-
-        .recommendation-list li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #667eea;
-            font-weight: bold;
-        }
-
-        .reset-btn {
-            padding: 12px 30px;
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .reset-btn:hover {
-            background: #667eea;
-            color: white;
-        }
-
-        .history-item {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border-left: 4px solid #667eea;
-        }
-
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .history-date {
-            font-weight: 600;
-            color: #667eea;
-        }
-
-        .severity-badge {
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 600;
-        }
-
-        .severity-mild {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .severity-moderate {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .severity-severe {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .history-symptoms {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .symptom-badge {
-            background: #667eea;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.9em;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            opacity: 0.9;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #666;
-        }
-
-        .empty-state h3 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .delete-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-        }
-
-        .delete-btn:hover {
-            background: #c82333;
-        }
-
-        .clear-all-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .clear-all-btn:hover {
-            background: #c82333;
-        }
+        /* Medication info UI */
+        .med-info-btn{ padding:6px 10px; border-radius:6px; border:1px solid #667eea; background:white; color:#667eea; cursor:pointer; font-weight:600; font-size:.9em; }
+        .med-info-btn:hover{ background:#eef2ff; }
+        .med-info { margin-top:8px; padding:10px; border-radius:8px; background:#fff; border:1px solid #eee; font-size:.95em; display:none; }
+        .med-info.show { display:block; }
+        .med-info .row { margin-bottom:6px; color:#333; }
+        .med-info a { color:#1d4ed8; text-decoration:underline; font-weight:600; }
     </style>
 </head>
 <body>
@@ -415,18 +56,41 @@
             <h1>🏥 Intelligent Health Guide</h1>
             <p>Your virtual health companion for common ailments</p>
             <div class="nav-tabs">
-                <button class="nav-tab active" onclick="switchTab('assessment')">New Assessment</button>
-                <button class="nav-tab" onclick="switchTab('history')">History</button>
-                <button class="nav-tab" onclick="switchTab('insights')">Insights</button>
+                <div class="nav-tab">New Assessment</div>
             </div>
         </div>
 
         <div class="content">
-            <!-- Assessment Tab -->
-            <div id="assessment" class="tab-content active">
+            <!-- Assessment Tab (only) -->
+            <div id="assessment">
                 <div class="symptom-section">
                     <h2>Select Your Symptoms</h2>
                     <div class="symptom-grid" id="symptomGrid"></div>
+                </div>
+
+                <div class="patient-info">
+                    <label>Age:
+                        <input type="number" id="ageInput" min="0" max="120" value="30" />
+                    </label>
+
+                    <label>Sex:
+                        <select id="sexInput">
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </label>
+
+                    <label style="display:flex;align-items:center;gap:8px;">
+                        <input type="checkbox" id="useInfermedica" />
+                        Use Infermedica
+                        <span class="small-muted">(optional - requires App-Id & App-Key)</span>
+                    </label>
+
+                    <div id="infermedicaKeys" style="display:none;gap:8px;align-items:center;">
+                        <input type="text" id="infermedicaAppId" placeholder="App-Id" />
+                        <input type="text" id="infermedicaAppKey" placeholder="App-Key" />
+                    </div>
                 </div>
 
                 <div class="severity-selector">
@@ -441,20 +105,6 @@
                 <button class="analyze-btn" id="analyzeBtn" disabled>Get Recommendations</button>
 
                 <div class="results" id="results"></div>
-            </div>
-
-            <!-- History Tab -->
-            <div id="history" class="tab-content">
-                <h2 style="margin-bottom: 20px;">Assessment History</h2>
-                <button class="clear-all-btn" onclick="clearAllHistory()" id="clearAllBtn" style="display: none;">Clear All History</button>
-                <div id="historyList"></div>
-            </div>
-
-            <!-- Insights Tab -->
-            <div id="insights" class="tab-content">
-                <h2 style="margin-bottom: 20px;">Health Insights</h2>
-                <div class="stats-grid" id="statsGrid"></div>
-                <div id="insightsList"></div>
             </div>
         </div>
     </div>
@@ -540,7 +190,7 @@
         let selectedSeverity = '';
         let db;
 
-        // Initialize IndexedDB
+        // Initialize IndexedDB (kept for storing assessments if needed)
         function initDB() {
             const request = indexedDB.open('HealthDB', 1);
             
@@ -551,8 +201,6 @@
             request.onsuccess = function() {
                 db = request.result;
                 console.log('Database initialized successfully');
-                loadHistory();
-                loadInsights();
             };
             
             request.onupgradeneeded = function(e) {
@@ -585,191 +233,85 @@
             };
         }
 
-        // Load history
-        function loadHistory() {
-            if (!db) return;
-            
-            const transaction = db.transaction(['assessments'], 'readonly');
-            const objectStore = transaction.objectStore('assessments');
-            const request = objectStore.getAll();
-            
-            request.onsuccess = function() {
-                const assessments = request.result.reverse();
-                displayHistory(assessments);
-            };
-        }
+        // Infermedica symptom mapping (placeholder ids) - replace with correct s_ ids from Infermedica
+        const symptomToInfermedica = {
+            fever: 's_21',        // update with correct Infermedica symptom id for fever
+            cold: 's_98',        // update
+            cough: 's_10',       // update
+            headache: 's_15',    // update
+            fatigue: 's_23',     // update
+            sore_throat: 's_60', // update
+            body_pain: 's_12',   // update
+            nausea: 's_45',      // update
+            diarrhea: 's_50',    // update
+            dizziness: 's_70'    // update
+        };
 
-        // Display history
-        function displayHistory(assessments) {
-            const historyList = document.getElementById('historyList');
-            const clearAllBtn = document.getElementById('clearAllBtn');
-            
-            if (assessments.length === 0) {
-                historyList.innerHTML = `
-                    <div class="empty-state">
-                        <h3>No assessments yet</h3>
-                        <p>Complete your first health assessment to see your history here.</p>
-                    </div>
-                `;
-                clearAllBtn.style.display = 'none';
-                return;
+        // Call Infermedica diagnosis endpoint
+        async function callInfermedica(selectedIds, age, sex, appId, appKey) {
+            // build evidence
+            const evidence = selectedIds.map(id => {
+                const symId = symptomToInfermedica[id];
+                if (!symId) return null;
+                return { id: symId, choice_id: 'present' };
+            }).filter(Boolean);
+
+            if (evidence.length === 0) {
+                throw new Error('No mapped symptoms for Infermedica. Update mapping.');
             }
 
-            clearAllBtn.style.display = 'block';
-            
-            historyList.innerHTML = assessments.map(assessment => {
-                const date = new Date(assessment.timestamp);
-                const symptomNames = assessment.symptoms.map(id => 
-                    symptoms.find(s => s.id === id)?.name || id
-                );
-                
-                return `
-                    <div class="history-item">
-                        <div class="history-header">
-                            <span class="history-date">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</span>
-                            <div>
-                                <span class="severity-badge severity-${assessment.severity}">${assessment.severity.toUpperCase()}</span>
-                                <button class="delete-btn" onclick="deleteAssessment(${assessment.id})">Delete</button>
-                            </div>
-                        </div>
-                        <div class="history-symptoms">
-                            ${symptomNames.map(name => `<span class="symptom-badge">${name}</span>`).join('')}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
+            const payload = { sex: sex || 'male', age: Number(age) || 30, evidence };
 
-        // Delete assessment
-        function deleteAssessment(id) {
-            if (!confirm('Are you sure you want to delete this assessment?')) return;
-            
-            const transaction = db.transaction(['assessments'], 'readwrite');
-            const objectStore = transaction.objectStore('assessments');
-            objectStore.delete(id);
-            
-            transaction.oncomplete = function() {
-                loadHistory();
-                loadInsights();
-            };
-        }
-
-        // Clear all history
-        function clearAllHistory() {
-            if (!confirm('Are you sure you want to delete all assessment history? This cannot be undone.')) return;
-            
-            const transaction = db.transaction(['assessments'], 'readwrite');
-            const objectStore = transaction.objectStore('assessments');
-            objectStore.clear();
-            
-            transaction.oncomplete = function() {
-                loadHistory();
-                loadInsights();
-            };
-        }
-
-        // Load insights
-        function loadInsights() {
-            if (!db) return;
-            
-            const transaction = db.transaction(['assessments'], 'readonly');
-            const objectStore = transaction.objectStore('assessments');
-            const request = objectStore.getAll();
-            
-            request.onsuccess = function() {
-                const assessments = request.result;
-                displayInsights(assessments);
-            };
-        }
-
-        // Display insights
-        function displayInsights(assessments) {
-            const statsGrid = document.getElementById('statsGrid');
-            const insightsList = document.getElementById('insightsList');
-            
-            if (assessments.length === 0) {
-                statsGrid.innerHTML = '';
-                insightsList.innerHTML = `
-                    <div class="empty-state">
-                        <h3>No data yet</h3>
-                        <p>Complete assessments to see your health insights and patterns.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            // Calculate stats
-            const totalAssessments = assessments.length;
-            const symptomCounts = {};
-            const severityCounts = { mild: 0, moderate: 0, severe: 0 };
-            
-            assessments.forEach(assessment => {
-                severityCounts[assessment.severity]++;
-                assessment.symptoms.forEach(symptom => {
-                    symptomCounts[symptom] = (symptomCounts[symptom] || 0) + 1;
-                });
+            const res = await fetch('https://api.infermedica.com/v3/diagnosis', {
+                method: 'POST',
+                headers: {
+                    'App-Id': appId,
+                    'App-Key': appKey,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
             });
 
-            const mostCommonSymptom = Object.entries(symptomCounts)
-                .sort((a, b) => b[1] - a[1])[0];
-            
-            const symptomName = symptoms.find(s => s.id === mostCommonSymptom[0])?.name || 'N/A';
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`Infermedica API error ${res.status}: ${text}`);
+            }
 
-            // Display stats
-            statsGrid.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-number">${totalAssessments}</div>
-                    <div class="stat-label">Total Assessments</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${symptomName}</div>
-                    <div class="stat-label">Most Common Symptom</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${severityCounts.severe}</div>
-                    <div class="stat-label">Severe Cases</div>
-                </div>
-            `;
-
-            // Display symptom frequency
-            const sortedSymptoms = Object.entries(symptomCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5);
-
-            insightsList.innerHTML = `
-                <div class="recommendation-section">
-                    <h3>📊 Symptom Frequency</h3>
-                    <ul class="recommendation-list">
-                        ${sortedSymptoms.map(([id, count]) => {
-                            const name = symptoms.find(s => s.id === id)?.name || id;
-                            return `<li>${name}: ${count} time${count > 1 ? 's' : ''}</li>`;
-                        }).join('')}
-                    </ul>
-                </div>
-                <div class="recommendation-section">
-                    <h3>💡 Health Tips Based on Your History</h3>
-                    <ul class="recommendation-list">
-                        ${severityCounts.severe > 2 ? '<li>You have had multiple severe symptoms. Consider scheduling a general checkup.</li>' : ''}
-                        ${symptomCounts.fatigue >= 3 ? '<li>Recurring fatigue detected. Ensure adequate sleep and consider vitamin supplements.</li>' : ''}
-                        ${symptomCounts.headache >= 3 ? '<li>Frequent headaches noted. Stay hydrated and reduce screen time.</li>' : ''}
-                        ${symptomCounts.cold >= 2 ? '<li>Multiple colds recorded. Boost immunity with vitamin C and rest.</li>' : ''}
-                        <li>Keep tracking your symptoms to identify patterns and triggers.</li>
-                        <li>Maintain a balanced diet and regular exercise routine.</li>
-                    </ul>
-                </div>
-            `;
+            return res.json();
         }
 
-        // Switch tabs
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-            
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
+        // Medication info integration: RxNav (RxNorm) - no API key
+        const medInfoCache = {};
 
-            if (tabName === 'history') loadHistory();
-            if (tabName === 'insights') loadInsights();
+        function normalizeMedName(name) {
+            // remove dosage parentheses and trim
+            return name.replace(/\(.*?\)/g, '').replace(/\s+/g, ' ').trim();
+        }
+
+        async function fetchMedicationInfo(medName) {
+            const normalized = normalizeMedName(medName);
+            if (medInfoCache[normalized]) return medInfoCache[normalized];
+
+            // 1) lookup rxcui by name
+            const lookupUrl = `https://rxnav.nlm.nih.gov/REST/rxcui.json?name=${encodeURIComponent(normalized)}`;
+            const res1 = await fetch(lookupUrl);
+            if (!res1.ok) throw new Error(`RxNav lookup failed (${res1.status})`);
+            const data1 = await res1.json();
+            const rxcui = data1.idGroup?.rxnormId?.[0] || null;
+            if (!rxcui) {
+                medInfoCache[normalized] = { found:false, name:normalized };
+                return medInfoCache[normalized];
+            }
+
+            // 2) fetch properties
+            const propRes = await fetch(`https://rxnav.nlm.nih.gov/REST/rxcui/${rxcui}/properties.json`);
+            if (!propRes.ok) throw new Error(`RxNav properties failed (${propRes.status})`);
+            const propData = await propRes.json();
+            const props = propData.properties || {};
+
+            // cache and return
+            medInfoCache[normalized] = { found:true, rxcui, properties: props, name: normalized };
+            return medInfoCache[normalized];
         }
 
         // Render symptoms
@@ -794,6 +336,11 @@
             };
         });
 
+        // toggle infermedica keys visibility
+        document.getElementById('useInfermedica').addEventListener('change', (e) => {
+            document.getElementById('infermedicaKeys').style.display = e.target.checked ? 'flex' : 'none';
+        });
+
         function toggleSymptom(id, card) {
             if (selectedSymptoms.has(id)) {
                 selectedSymptoms.delete(id);
@@ -811,29 +358,203 @@
 
         document.getElementById('analyzeBtn').onclick = analyzeSymptoms;
 
-        function analyzeSymptoms() {
+        // helper to create medicine list items with info button
+        function medicineListItemHTML(medName) {
+            const safeId = 'med-' + encodeURIComponent(medName.replace(/\s+/g, '-').toLowerCase());
+            return `<span style="flex:1">${medName}</span>
+                    <button class="med-info-btn" data-med="${escapeHtml(medName)}" data-target="${safeId}">Info</button>
+                    <div id="${safeId}" class="med-info" aria-hidden="true"></div>`;
+        }
+
+        // simple escape for attribute storage
+        function escapeHtml(s) { return String(s).replace(/"/g,'&quot;').replace(/'/g,"&#39;"); }
+
+        async function analyzeSymptoms() {
             const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            resultsDiv.classList.remove('show');
+
+            const selectedArray = Array.from(selectedSymptoms);
+            const age = document.getElementById('ageInput').value;
+            const sex = document.getElementById('sexInput').value;
+            const useInfermedica = document.getElementById('useInfermedica').checked;
+            const appId = document.getElementById('infermedicaAppId').value.trim();
+            const appKey = document.getElementById('infermedicaAppKey').value.trim();
+
+            let infermedicaResult = null;
+            if (useInfermedica) {
+                if (!appId || !appKey) {
+                    resultsDiv.innerHTML = `<div class="alert-box alert-warning">Infermedica selected but App-Id/App-Key not provided. Falling back to local recommendations.</div>`;
+                } else {
+                    try {
+                        const data = await callInfermedica(selectedArray, age, sex, appId, appKey);
+                        infermedicaResult = data;
+                    } catch (err) {
+                        resultsDiv.innerHTML = `<div class="alert-box alert-warning">Infermedica call failed: ${err.message}. Continuing with local recommendations.</div>`;
+                    }
+                }
+            }
+
             let html = '';
 
+            // Show Infermedica conditions if present
+            if (infermedicaResult && Array.isArray(infermedicaResult.conditions) && infermedicaResult.conditions.length > 0) {
+                html += `<div class="infermedica-conds"><strong>Infermedica — Top conditions:</strong><ul>`;
+                infermedicaResult.conditions.slice(0, 5).forEach(c => {
+                    const name = c.common_name || c.name || c.id;
+                    const prob = (c.probability ? (c.probability * 100).toFixed(1) + '%' : '');
+                    html += `<li>${name} ${prob ? '— ' + prob : ''}</li>`;
+                });
+                html += `</ul></div>`;
+            }
+
             // Check if needs doctor immediately
-            const needsDoctor = selectedSeverity === 'severe' || 
-                               (selectedSeverity === 'moderate' && selectedSymptoms.size > 3);
+            const needsDoctor = selectedSeverity === 'severe' || (selectedSeverity === 'moderate' && selectedSymptoms.size > 3);
 
             if (needsDoctor) {
-                html += `
-                    <div class="alert-box alert-danger">
-                        ⚠️ <strong>SEEK MEDICAL ATTENTION:</strong> Based on your symptoms and severity, 
-                        we recommend consulting a healthcare professional immediately.
-                    </div>
-                `;
+                html += `<div class="alert-box alert-danger">⚠️ <strong>SEEK MEDICAL ATTENTION:</strong> Based on your symptoms and severity, consult a healthcare professional.</div>`;
             } else if (selectedSeverity === 'moderate') {
-                html += `
-                    <div class="alert-box alert-warning">
-                        ⚡ <strong>Monitor Closely:</strong> If symptoms worsen or persist beyond 3-4 days, 
-                        please consult a doctor.
-                    </div>
-                `;
+                html += `<div class="alert-box alert-warning">⚡ <strong>Monitor Closely:</strong> If symptoms worsen or persist beyond 3-4 days, consult a doctor.</div>`;
             } else {
-                html += `
-                    <div class="alert-box alert-success">
-                        
+                html += `<div class="alert-box alert-success">✅ <strong>Self-care Advice:</strong> These recommendations may help. If symptoms persist, seek medical advice.</div>`;
+            }
+
+            // Aggregate recommendations across selected symptoms
+            const agg = { medicines: new Set(), diet: new Set(), remedies: new Set(), exercises: new Set() };
+            selectedArray.forEach(id => {
+                const rec = recommendations[id];
+                if (!rec) return;
+                rec.medicines?.forEach(m => agg.medicines.add(m));
+                rec.diet?.forEach(d => agg.diet.add(d));
+                rec.remedies?.forEach(r => agg.remedies.add(r));
+                rec.exercises?.forEach(e => agg.exercises.add(e));
+            });
+
+            function setToList(set, isMedicine=false) {
+                if (!set || set.size === 0) return '<li>No specific recommendations.</li>';
+                return Array.from(set).map(item => {
+                    if (isMedicine) return `<li>${medicineListItemHTML(item)}</li>`;
+                    return `<li><span style="flex:1">${item}</span></li>`;
+                }).join('');
+            }
+
+            html += `
+                <div class="recommendation-section">
+                    <h3>🩺 Suggested Medicines / OTC</h3>
+                    <ul class="recommendation-list">
+                        ${setToList(agg.medicines, true)}
+                    </ul>
+                    <div class="small-muted">Tap "Info" to fetch medication identifiers (RxCUI) and quick links (RxNorm / DailyMed).</div>
+                </div>
+
+                <div class="recommendation-section">
+                    <h3>🍎 Dietary Advice</h3>
+                    <ul class="recommendation-list">
+                        ${setToList(agg.diet)}
+                    </ul>
+                </div>
+
+                <div class="recommendation-section">
+                    <h3>🏡 Home Remedies</h3>
+                    <ul class="recommendation-list">
+                        ${setToList(agg.remedies)}
+                    </ul>
+                </div>
+
+                <div class="recommendation-section">
+                    <h3>🏃‍♀️ Activity / Exercises</h3>
+                    <ul class="recommendation-list">
+                        ${setToList(agg.exercises)}
+                    </ul>
+                </div>
+
+                <div style="display:flex;gap:12px;align-items:center;margin-top:10px;">
+                    <button class="reset-btn" id="resetBtn">Start New Assessment</button>
+                </div>
+            `;
+
+            resultsDiv.innerHTML += html;
+            resultsDiv.classList.add('show');
+
+            // Save assessment to DB (including Infermedica result summary if any)
+            const assessment = {
+                symptoms: selectedArray,
+                severity: selectedSeverity,
+                timestamp: Date.now(),
+                age: Number(age),
+                sex: sex,
+                infermedica: infermedicaResult ? { conditions: (infermedicaResult.conditions || []).slice(0,3).map(c=>({ id:c.id, name:c.name, probability:c.probability })) } : null
+            };
+
+            saveAssessment(assessment);
+
+            // Wire reset button
+            const resetBtn = document.getElementById('resetBtn');
+            if (resetBtn) resetBtn.onclick = resetAssessment;
+        }
+
+        function resetAssessment() {
+            selectedSymptoms.clear();
+            selectedSeverity = '';
+            document.querySelectorAll('.symptom-card').forEach(card => card.classList.remove('selected'));
+            document.querySelectorAll('.severity-btn').forEach(b => b.classList.remove('active'));
+            updateAnalyzeButton();
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            resultsDiv.classList.remove('show');
+        }
+
+        // Delegate click for med info buttons
+        document.addEventListener('click', async (e) => {
+            const btn = e.target.closest && e.target.closest('.med-info-btn');
+            if (!btn) return;
+            const med = btn.dataset.med;
+            const targetId = btn.dataset.target;
+            const container = document.getElementById(targetId);
+            if (!container) return;
+
+            // toggle if already shown
+            if (container.classList.contains('show')) {
+                container.classList.remove('show');
+                container.innerHTML = '';
+                btn.textContent = 'Info';
+                return;
+            }
+
+            // show loading
+            container.classList.add('show');
+            container.innerHTML = `<div class="row">Loading info for <strong>${med}</strong>…</div>`;
+            btn.textContent = 'Loading…';
+
+            try {
+                const info = await fetchMedicationInfo(med);
+                if (!info.found) {
+                    container.innerHTML = `<div class="row">No RxNorm match found for <strong>${info.name}</strong>.</div>
+                    <div class="row">Try searching on DailyMed: <a href="https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=${encodeURIComponent(info.name)}" target="_blank" rel="noopener">DailyMed</a></div>`;
+                } else {
+                    const p = info.properties || {};
+                    container.innerHTML = `
+                        <div class="row"><strong>RxCUI:</strong> ${info.rxcui}</div>
+                        <div class="row"><strong>Name:</strong> ${escapeHtml(p.name || p.displayName || info.name)}</div>
+                        <div class="row"><strong>Synonym:</strong> ${escapeHtml(p.synonym || p.termType || 'N/A')}</div>
+                        <div class="row"><strong>RxNorm ID:</strong> ${escapeHtml(p.rxnormId || 'N/A')}</div>
+                        <div class="row">Quick links: 
+                            <a href="https://rxnav.nlm.nih.gov/REST/rxcui/${info.rxcui}/" target="_blank" rel="noopener">RxNorm</a>
+                            &nbsp;|&nbsp;
+                            <a href="https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=${encodeURIComponent(info.name)}" target="_blank" rel="noopener">DailyMed</a>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                container.innerHTML = `<div class="row">Error fetching info: ${escapeHtml(err.message)}</div>
+                    <div class="row">Try searching on DailyMed: <a href="https://dailymed.nlm.nih.gov/dailymed/search.cfm?query=${encodeURIComponent(med)}" target="_blank" rel="noopener">DailyMed</a></div>`;
+            } finally {
+                btn.textContent = 'Info';
+            }
+        });
+
+        // initialize DB on load
+        window.addEventListener('load', () => { initDB(); });
+    </script>
+</body>
+</html>
