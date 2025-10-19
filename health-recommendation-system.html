@@ -112,77 +112,147 @@
     <script>
         const symptoms = [
             { id: 'fever', name: 'Fever', desc: 'High temperature' },
-            { id: 'cold', name: 'Cold', desc: 'Runny/stuffy nose' },
+            { id: 'cold', name: 'Cold', desc: 'Runny / stuffy nose' },
             { id: 'cough', name: 'Cough', desc: 'Dry or wet cough' },
             { id: 'headache', name: 'Headache', desc: 'Head pain' },
-            { id: 'fatigue', name: 'Fatigue', desc: 'Tiredness' },
+            { id: 'fatigue', name: 'Fatigue / Tiredness', desc: 'Low energy or tiredness' },
             { id: 'sore_throat', name: 'Sore Throat', desc: 'Throat pain' },
-            { id: 'body_pain', name: 'Body Pain', desc: 'Muscle aches' },
-            { id: 'nausea', name: 'Nausea', desc: 'Upset stomach' },
-            { id: 'diarrhea', name: 'Diarrhea', desc: 'Loose stools' },
-            { id: 'dizziness', name: 'Dizziness', desc: 'Light-headed' }
+            { id: 'body_pain', name: 'Body Pains', desc: 'Muscle aches / generalized pain' },
+            { id: 'nausea', name: 'Nausea', desc: 'Feeling like vomiting' },
+            { id: 'vomiting', name: 'Vomiting', desc: 'Throwing up' },
+            { id: 'diarrhea', name: 'Diarrhea', desc: 'Loose stools / frequent motions' },
+            { id: 'motion_sickness', name: 'Motion Sickness', desc: 'Nausea/dizziness from travel' },
+            { id: 'fainting', name: 'Fainting / Syncope', desc: 'Brief loss of consciousness' },
+            { id: 'menstrual', name: 'Periods / Menstrual Pain', desc: 'Cramping during periods' },
+            { id: 'leg_pain', name: 'Leg Pain', desc: 'Pain in legs' },
+            { id: 'back_pain', name: 'Back Pain', desc: 'Lower/upper back pain' },
+            { id: 'stomach_pain', name: 'Stomach Pain', desc: 'Abdominal / stomach pain' },
+            { id: 'indigestion', name: 'Indigestion / Gastric', desc: 'Heartburn, bloating, gas' },
+            { id: 'rash', name: 'Skin Rash', desc: 'Redness, itching or bumps' },
+            { id: 'neck_pain', name: 'Neck Pain', desc: 'Stiff or painful neck' },
+            { id: 'dizziness', name: 'Dizziness', desc: 'Light‑headed or unsteady' }
         ];
 
         const recommendations = {
             fever: {
                 medicines: ['Paracetamol (500mg)', 'Ibuprofen (as directed)'],
-                diet: ['Stay hydrated with water and ORS', 'Light soups and broths', 'Fresh fruits like oranges', 'Avoid heavy, oily foods'],
-                remedies: ['Cold compress on forehead', 'Lukewarm bath', 'Rest in cool room', 'Wear light clothing'],
-                exercises: ['Complete bed rest', 'Light walking only when fever subsides']
+                diet: ['Stay hydrated', 'Light soups', 'Fruits'],
+                remedies: ['Cool compress', 'Rest'],
+                exercises: ['Rest']
             },
             cold: {
-                medicines: ['Antihistamine tablets', 'Decongestant nasal spray', 'Vitamin C supplements'],
-                diet: ['Warm water with honey and lemon', 'Ginger tea', 'Chicken soup', 'Garlic in meals', 'Citrus fruits'],
-                remedies: ['Steam inhalation 2-3 times daily', 'Saline nasal rinse', 'Warm salt water gargle', 'Keep head elevated while sleeping'],
-                exercises: ['Light walking', 'Breathing exercises', 'Avoid intense workouts']
+                medicines: ['Antihistamine', 'Decongestant'],
+                diet: ['Warm fluids', 'Ginger', 'Honey/lemon'],
+                remedies: ['Steam inhalation', 'Nasal saline'],
+                exercises: ['Light walking']
             },
             cough: {
-                medicines: ['Cough syrup (as per type)', 'Honey-based lozenges', 'Expectorant if needed'],
-                diet: ['Warm water throughout day', 'Honey with warm water', 'Ginger tea', 'Turmeric milk', 'Avoid cold drinks'],
-                remedies: ['Steam inhalation with eucalyptus', 'Honey before bed', 'Elevate head while sleeping', 'Stay in humid environment'],
-                exercises: ['Breathing exercises', 'Light yoga', 'Avoid dusty areas']
+                medicines: ['Cough syrup / lozenges'],
+                diet: ['Warm drinks', 'Honey'],
+                remedies: ['Steam', 'Humidifier'],
+                exercises: ['Breathing exercises']
             },
             headache: {
-                medicines: ['Paracetamol', 'Ibuprofen', 'Aspirin (if not contraindicated)'],
-                diet: ['Plenty of water', 'Magnesium-rich foods (nuts, seeds)', 'Avoid caffeine and alcohol', 'Regular small meals'],
-                remedies: ['Cold or warm compress', 'Rest in dark, quiet room', 'Gentle head massage', 'Peppermint oil on temples'],
-                exercises: ['Neck stretches', 'Light walking', 'Yoga and meditation', 'Avoid screens']
+                medicines: ['Paracetamol', 'Ibuprofen'],
+                diet: ['Hydrate', 'Small regular meals'],
+                remedies: ['Dark quiet room', 'Cold/warm compress'],
+                exercises: ['Neck stretches', 'Relaxation']
             },
             fatigue: {
-                medicines: ['Multivitamin supplements', 'Iron supplements (if deficient)', 'B-complex vitamins'],
-                diet: ['Protein-rich foods', 'Whole grains', 'Fresh fruits and vegetables', 'Nuts and seeds', 'Stay hydrated'],
-                remedies: ['Adequate sleep (7-8 hours)', 'Power naps (20 minutes)', 'Reduce stress', 'Sunlight exposure'],
-                exercises: ['Light cardio (15-20 min)', 'Stretching', 'Short walks', 'Yoga', 'Gradually increase activity']
+                medicines: ['Multivitamin (if needed)'],
+                diet: ['Balanced meals', 'Hydration'],
+                remedies: ['Sleep hygiene', 'Short naps'],
+                exercises: ['Light cardio', 'Stretching']
             },
             sore_throat: {
-                medicines: ['Throat lozenges', 'Antiseptic mouthwash', 'Pain reliever if needed'],
-                diet: ['Warm liquids (tea, soup)', 'Honey', 'Soft foods', 'Ice cream or popsicles', 'Avoid spicy foods'],
-                remedies: ['Warm salt water gargle 3-4 times', 'Honey and lemon', 'Steam inhalation', 'Stay hydrated'],
-                exercises: ['Rest your voice', 'Light activities only', 'Avoid talking loudly']
+                medicines: ['Lozenges', 'Analgesic if needed'],
+                diet: ['Warm liquids', 'Soft foods'],
+                remedies: ['Salt water gargle', 'Steam'],
+                exercises: ['Rest voice']
             },
             body_pain: {
-                medicines: ['Ibuprofen', 'Muscle relaxant cream', 'Pain relief gel'],
-                diet: ['Anti-inflammatory foods', 'Turmeric milk', 'Omega-3 rich foods', 'Stay hydrated'],
-                remedies: ['Warm compress', 'Epsom salt bath', 'Gentle massage', 'Adequate rest'],
-                exercises: ['Light stretching', 'Gentle yoga', 'Avoid strenuous activity', 'Gradual movement']
+                medicines: ['Ibuprofen', 'Topical analgesic'],
+                diet: ['Anti-inflammatory foods'],
+                remedies: ['Heat/ice', 'Massage'],
+                exercises: ['Gentle stretching']
             },
             nausea: {
-                medicines: ['Antacid tablets', 'Anti-nausea medication', 'Digestive enzymes'],
-                diet: ['Ginger tea', 'Plain crackers', 'Banana', 'Rice', 'Toast', 'Small frequent meals', 'Avoid greasy foods'],
-                remedies: ['Fresh air', 'Peppermint tea', 'Lemon scent', 'Rest after meals', 'Avoid strong odors'],
-                exercises: ['Minimal movement', 'Deep breathing', 'Rest in comfortable position']
+                medicines: ['Antiemetic (as directed)'],
+                diet: ['Small bland meals', 'Ginger', 'Crackers'],
+                remedies: ['Fresh air', 'Peppermint'],
+                exercises: ['Rest']
+            },
+            vomiting: {
+                medicines: ['Antiemetic if persistent'],
+                diet: ['Small sips of oral rehydration', 'BRAT foods when stable'],
+                remedies: ['Rest', 'Avoid strong smells'],
+                exercises: ['Rest']
             },
             diarrhea: {
-                medicines: ['ORS sachets', 'Probiotic supplements', 'Anti-diarrheal (if needed)'],
-                diet: ['ORS solution', 'Banana', 'Rice', 'Applesauce', 'Toast (BRAT diet)', 'Coconut water', 'Avoid dairy and spicy foods'],
-                remedies: ['Stay hydrated constantly', 'Frequent small sips of water', 'Rest', 'Maintain hygiene'],
-                exercises: ['Complete rest', 'Minimal activity', 'Avoid physical exertion']
+                medicines: ['ORS', 'Probiotics if appropriate'],
+                diet: ['ORS', 'BRAT diet', 'Avoid dairy/spicy'],
+                remedies: ['Hydration', 'Rest'],
+                exercises: ['Rest']
+            },
+            motion_sickness: {
+                medicines: ['Antihistamine (meclizine) if suitable'],
+                diet: ['Light snacks', 'Avoid heavy meals before travel'],
+                remedies: ['Look at horizon', 'Fresh air', 'Ginger'],
+                exercises: ['Sit still, avoid sudden movements']
+            },
+            fainting: {
+                medicines: [],
+                diet: ['Stay hydrated', 'Eat regularly to avoid low sugar'],
+                remedies: ['Lie flat and elevate legs', 'Seek medical evaluation'],
+                exercises: ['Avoid sudden standing']
+            },
+            menstrual: {
+                medicines: ['NSAIDs (ibuprofen) for cramps'],
+                diet: ['Warm fluids', 'Light, balanced meals'],
+                remedies: ['Heat pack on abdomen', 'Rest'],
+                exercises: ['Light walking', 'Gentle stretching']
+            },
+            leg_pain: {
+                medicines: ['NSAIDs as appropriate'],
+                diet: ['Hydration', 'Electrolytes if cramps'],
+                remedies: ['Stretching', 'Heat/ice', 'Elevation'],
+                exercises: ['Leg stretches', 'Walking']
+            },
+            back_pain: {
+                medicines: ['NSAIDs', 'Topical analgesics'],
+                diet: ['Anti-inflammatory foods'],
+                remedies: ['Heat/ice', 'Proper posture', 'Stretching'],
+                exercises: ['Core strengthening', 'Gentle stretching']
+            },
+            stomach_pain: {
+                medicines: ['Antacid / antispasmodic as appropriate'],
+                diet: ['Bland foods', 'Avoid greasy/spicy items'],
+                remedies: ['Warm compress', 'Small frequent meals'],
+                exercises: ['Gentle walking']
+            },
+            indigestion: {
+                medicines: ['Antacids', 'H2 blockers if needed'],
+                diet: ['Avoid late heavy meals', 'Small portions'],
+                remedies: ['Avoid lying down immediately after eating'],
+                exercises: ['Light walking after meals']
+            },
+            rash: {
+                medicines: ['Antihistamine for itch', 'Topical emollients'],
+                diet: ['Avoid known triggers'],
+                remedies: ['Cool compress', 'Avoid scratching'],
+                exercises: ['Avoid irritants']
+            },
+            neck_pain: {
+                medicines: ['NSAIDs', 'Topical analgesic'],
+                diet: ['Stay hydrated'],
+                remedies: ['Neck stretches', 'Heat/ice', 'Posture correction'],
+                exercises: ['Range-of-motion exercises']
             },
             dizziness: {
-                medicines: ['Anti-vertigo medication', 'Vitamin B6', 'Ginger supplements'],
-                diet: ['Stay hydrated', 'Small frequent meals', 'Ginger tea', 'Avoid alcohol and caffeine'],
-                remedies: ['Sit or lie down immediately', 'Focus on fixed point', 'Avoid sudden movements', 'Adequate sleep'],
-                exercises: ['Balance exercises (carefully)', 'Avoid heights', 'Move slowly', 'Rest frequently']
+                medicines: ['Anti-vertigo meds if prescribed'],
+                diet: ['Hydrate', 'Small frequent meals'],
+                remedies: ['Sit/lie down if dizzy', 'Avoid sudden movements'],
+                exercises: ['Balance exercises carefully']
             }
         };
 
